@@ -83,8 +83,6 @@ export const APT_DATA: Record<AptType, AptData> = {
   },
   '84B': {
     basePrice: {
-      '1층': 1022870000,
-      '2층': 1033750000,
       '3층': 1055500000,
       '4층': 1077260000,
       '5층이상': 1088150000,
@@ -101,6 +99,10 @@ export const APT_DATA: Record<AptType, AptData> = {
 export const TYPES: AptType[] = ['46', '55A', '55B', '55C', '84A', '84B'];
 export const SUB_TYPES: string[] = ['사전청약 당첨자', '일반 당첨자'];
 export const FLOORS: FloorType[] = ['1층', '2층', '3층', '4층', '5층이상'];
+
+export const getAvailableFloors = (aptType: AptType): FloorType[] => {
+  return FLOORS.filter(floor => APT_DATA[aptType].basePrice[floor] !== undefined);
+};
 
 export const formatCurrency = (value: number) => {
   return new Intl.NumberFormat('ko-KR', {

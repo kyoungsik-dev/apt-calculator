@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { AptType, SubType, FloorType, UserSelection, OptionItem, AptData } from './types';
-import { APT_DATA, TYPES, SUB_TYPES, FLOORS, formatCurrency } from './constants';
+import { APT_DATA, TYPES, SUB_TYPES, FLOORS, formatCurrency, getAvailableFloors } from './constants';
 import * as htmlToImage from 'html-to-image';
 
 // Fix for TypeScript missing Kakao on window object
@@ -60,10 +60,14 @@ const buildShareURL = (selection: UserSelection): string => {
 const App: React.FC = () => {
   const [selection, setSelection] = useState<UserSelection>(() => {
     const urlSelection = getSelectionFromURL();
+    const aptType = urlSelection.aptType || '84A';
+    const availableFloors = getAvailableFloors(aptType);
+    const requestedFloor = urlSelection.floor || '5층이상';
+    const floor = availableFloors.includes(requestedFloor) ? requestedFloor : availableFloors[availableFloors.length - 1];
     return {
-      aptType: urlSelection.aptType || '84A',
+      aptType,
       subType: urlSelection.subType || '일반 당첨자' as SubType,
-      floor: urlSelection.floor || '5층이상',
+      floor,
       selectedOptions: urlSelection.selectedOptions || [],
     };
   });
@@ -92,7 +96,11 @@ const App: React.FC = () => {
   }, [currentAptData]);
 
   const handleAptTypeChange = (type: AptType) => {
-    setSelection(s => ({ ...s, aptType: type, selectedOptions: [] }));
+    setSelection(s => {
+      const availableFloors = getAvailableFloors(type);
+      const newFloor = availableFloors.includes(s.floor) ? s.floor : availableFloors[availableFloors.length - 1];
+      return { ...s, aptType: type, floor: newFloor, selectedOptions: [] };
+    });
   };
 
   const toggleOption = (optionId: string) => {
@@ -105,7 +113,7 @@ const App: React.FC = () => {
   };
 
   const totals = useMemo(() => {
-    const base = currentAptData.basePrice[selection.floor];
+    const base = currentAptData.basePrice[selection.floor] ?? 0;
     const balcony = currentAptData.balconyPrice;
     const optionsCost = currentAptData.options
       .filter(opt => selection.selectedOptions.includes(opt.id))
@@ -213,7 +221,7 @@ const App: React.FC = () => {
               <div>
                 <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4">층수 선택</label>
                 <div className="grid grid-cols-2 gap-2">
-                  {FLOORS.map(floor => (
+                  {getAvailableFloors(selection.aptType).map(floor => (
                     <button key={floor} onClick={() => setSelection(s => ({ ...s, floor }))} className={`py-3 px-3 rounded-xl text-sm font-bold border-2 transition-all ${selection.floor === floor ? 'bg-indigo-600 border-indigo-600 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-600 hover:border-indigo-200'}`}>{floor}</button>
                   ))}
                 </div>

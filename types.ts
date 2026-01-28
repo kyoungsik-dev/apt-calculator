@@ -11,7 +11,7 @@ export interface OptionItem {
 }
 
 export interface AptData {
-  basePrice: Record<FloorType, number>;
+  basePrice: Partial<Record<FloorType, number>>;
   balconyPrice: number;
   options: OptionItem[];
 }
