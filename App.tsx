@@ -14,12 +14,58 @@ declare global {
 // 카카오 앱 키 (개발자 본인의 키로 교체 필요)
 const KAKAO_APP_KEY = 'ef79df4f4050b5cbd75d2aceaacf3ad8';
 
+// URL에서 선택값 읽기
+const getSelectionFromURL = (): Partial<UserSelection> => {
+  const params = new URLSearchParams(window.location.search);
+  const result: Partial<UserSelection> = {};
+
+  const aptType = params.get('aptType');
+  if (aptType && TYPES.includes(aptType as AptType)) {
+    result.aptType = aptType as AptType;
+  }
+
+  const subType = params.get('subType');
+  if (subType && SUB_TYPES.includes(subType)) {
+    result.subType = subType as SubType;
+  }
+
+  const floor = params.get('floor');
+  if (floor && FLOORS.includes(floor as FloorType)) {
+    result.floor = floor as FloorType;
+  }
+
+  const options = params.get('options');
+  if (options) {
+    result.selectedOptions = options.split(',').filter(Boolean);
+  }
+
+  return result;
+};
+
+// 선택값으로 URL 생성
+const buildShareURL = (selection: UserSelection): string => {
+  const baseUrl = window.location.origin + window.location.pathname;
+  const params = new URLSearchParams();
+
+  params.set('aptType', selection.aptType);
+  params.set('subType', selection.subType);
+  params.set('floor', selection.floor);
+  if (selection.selectedOptions.length > 0) {
+    params.set('options', selection.selectedOptions.join(','));
+  }
+
+  return `${baseUrl}?${params.toString()}`;
+};
+
 const App: React.FC = () => {
-  const [selection, setSelection] = useState<UserSelection>({
-    aptType: '84A',
-    subType: '일반 당첨자' as SubType,
-    floor: '5층이상',
-    selectedOptions: [],
+  const [selection, setSelection] = useState<UserSelection>(() => {
+    const urlSelection = getSelectionFromURL();
+    return {
+      aptType: urlSelection.aptType || '84A',
+      subType: urlSelection.subType || '일반 당첨자' as SubType,
+      floor: urlSelection.floor || '5층이상',
+      selectedOptions: urlSelection.selectedOptions || [],
+    };
   });
 
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -96,23 +142,25 @@ const App: React.FC = () => {
   const shareToKakao = () => {
     if (!window.Kakao) return;
 
+    const shareUrl = buildShareURL(selection);
+
     window.Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
         title: `과천주암 C1 분양가 계산: ${selection.aptType}형`,
         description: `${selection.floor} / ${selection.subType}\n총 예상 금액: ${formatCurrency(totals.total)}`,
-        imageUrl: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&h=400', 
+        imageUrl: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&h=400',
         link: {
-          mobileWebUrl: window.location.href,
-          webUrl: window.location.href,
+          mobileWebUrl: shareUrl,
+          webUrl: shareUrl,
         },
       },
       buttons: [
         {
           title: '직접 계산해보기',
           link: {
-            mobileWebUrl: window.location.href,
-            webUrl: window.location.href,
+            mobileWebUrl: shareUrl,
+            webUrl: shareUrl,
           },
         },
       ],
@@ -214,6 +262,26 @@ const App: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* Footer - Contact Info */}
+      <footer className="max-w-6xl mx-auto px-4 md:px-8 pb-8 lg:pb-8">
+        <div className="text-center py-6 border-t border-slate-200">
+          <p className="text-sm text-slate-500">
+            제작: <span className="font-semibold text-slate-700">코코넛파이</span>
+          </p>
+          <a
+            href="https://open.kakao.com/o/s2Pqmfag"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 mt-2 text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3C6.477 3 2 6.477 2 10.75c0 2.8 1.94 5.25 4.86 6.55l-1.23 4.5c-.08.3.18.55.44.43l5.23-2.48c.55.07 1.11.11 1.7.11 5.523 0 10-3.477 10-7.75S17.523 3 12 3z" />
+            </svg>
+            카카오톡 문의하기
+          </a>
+        </div>
+      </footer>
 
       {/* Mobile Sticky Bar */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-5 flex justify-between items-center shadow-[0_-8px_20px_rgba(0,0,0,0.08)] z-50">
