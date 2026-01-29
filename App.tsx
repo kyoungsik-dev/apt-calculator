@@ -247,7 +247,7 @@ const App: React.FC = () => {
                       const isSelected = selection.selectedOptions.includes(option.id);
                       return (
                         <div key={option.id} onClick={() => toggleOption(option.id)} className={`cursor-pointer group relative p-5 rounded-2xl border-2 transition-all flex justify-between items-center ${isSelected ? 'border-indigo-600 bg-indigo-50/50 ring-4 ring-indigo-50/20' : 'border-slate-50 bg-slate-50/50 hover:border-indigo-100 hover:bg-slate-50'}`}>
-                          <div className="flex flex-col"><span className="font-bold text-slate-800 text-base">{option.name}</span><span className="text-indigo-600 font-bold text-sm mt-1">+ {formatCurrency(option.price)}</span></div>
+                          <div className="flex flex-col"><span className="font-bold text-slate-800 text-base"><span className="text-indigo-600 mr-1.5">{option.number}</span>{option.name}</span><span className="text-indigo-600 font-bold text-sm mt-1">+ {formatCurrency(option.price)}</span></div>
                           <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'bg-indigo-600 border-indigo-600 scale-110' : 'bg-white border-slate-200 group-hover:border-indigo-300'}`}>
                             {isSelected && <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                           </div>
@@ -399,7 +399,7 @@ const SummaryCard: React.FC<{
               .map((opt: OptionItem) => (
                 <div key={opt.id} className="flex flex-col text-xs">
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-700 font-bold truncate max-w-[150px]">{opt.name}</span>
+                    <span className="text-slate-700 font-bold truncate max-w-[150px]"><span className="text-indigo-600 mr-1">{opt.number}</span>{opt.name}</span>
                     <span className="text-slate-900 font-black shrink-0">{formatCurrency(opt.price)}</span>
                   </div>
                   <span className="text-[9px] text-slate-400 font-bold uppercase mt-0.5">{opt.category}</span>

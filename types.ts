@@ -5,6 +5,7 @@ export type FloorType = '1층' | '2층' | '3층' | '4층' | '5층이상';
 
 export interface OptionItem {
   id: string;
+  number: string;
   name: string;
   price: number;
   category: string;
