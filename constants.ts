@@ -235,7 +235,8 @@ export const TYPES: AptType[] = ['46', '55A', '55B', '55C', '84A', '84B'];
 export const SUB_TYPES: string[] = ['사전청약 당첨자', '일반 당첨자'];
 export const FLOORS: FloorType[] = ['1층', '2층', '3층', '4층', '5층이상'];
 
-export const getAvailableFloors = (aptType: AptType): FloorType[] => {
+export const getAvailableFloors = (aptType: AptType | null): FloorType[] => {
+  if (!aptType) return FLOORS;
   return FLOORS.filter(floor => APT_DATA[aptType].basePrice[floor] !== undefined);
 };
 

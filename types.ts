@@ -18,8 +18,8 @@ export interface AptData {
 }
 
 export interface UserSelection {
-  aptType: AptType;
-  subType: SubType;
-  floor: FloorType;
+  aptType: AptType | null;
+  subType: SubType | null;
+  floor: FloorType | null;
   selectedOptions: string[]; // Option IDs
 }
