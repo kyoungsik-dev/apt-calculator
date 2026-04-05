@@ -5,20 +5,21 @@ export type FloorType = '1층' | '2층' | '3층' | '4층' | '5층이상';
 
 export interface OptionItem {
   id: string;
+  number: string;
   name: string;
   price: number;
   category: string;
 }
 
 export interface AptData {
-  basePrice: Record<FloorType, number>;
+  basePrice: Partial<Record<FloorType, number>>;
   balconyPrice: number;
   options: OptionItem[];
 }
 
 export interface UserSelection {
-  aptType: AptType;
-  subType: SubType;
-  floor: FloorType;
+  aptType: AptType | null;
+  subType: SubType | null;
+  floor: FloorType | null;
   selectedOptions: string[]; // Option IDs
 }
